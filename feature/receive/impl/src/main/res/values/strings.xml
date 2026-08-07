@@ -1,0 +1,7 @@
+<resources>
+    <string name="receive_title">Получить SOL</string>
+    <string name="receive_body">Отправьте SOL на этот адрес с другого кошелька или биржи (та же сеть, что выбрана в приложении).</string>
+    <string name="receive_copy">Копировать</string>
+    <string name="receive_copied">Скопировано</string>
+    <string name="receive_back">Назад</string>
+</resources>

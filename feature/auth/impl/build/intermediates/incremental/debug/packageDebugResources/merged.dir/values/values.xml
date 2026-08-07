@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="auth_create_wallet">Создать кошелёк</string>
+    <string name="auth_error_invalid_mnemonic">Неверная сид-фраза. Проверьте слова и порядок.</string>
+    <string name="auth_import_action">Импортировать</string>
+    <string name="auth_import_hint">Вставьте 12 или 24 слова через пробел</string>
+    <string name="auth_mnemonic_body">Запишите слова и храните в безопасном месте. Без них доступ к средствам будет невозможен.</string>
+    <string name="auth_mnemonic_confirm">Я сохранил фразу</string>
+    <string name="auth_mnemonic_title">Сохраните сид-фразу</string>
+    <string name="auth_welcome_subtitle">Принимайте и отправляйте SOL. Сеть по умолчанию — Devnet (тестовая).</string>
+    <string name="auth_welcome_title">Solana кошелёк</string>
+</resources>

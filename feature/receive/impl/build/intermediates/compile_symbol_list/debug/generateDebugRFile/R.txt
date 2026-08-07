@@ -1,0 +1,5 @@
+int string receive_back 0x0
+int string receive_body 0x0
+int string receive_copied 0x0
+int string receive_copy 0x0
+int string receive_title 0x0

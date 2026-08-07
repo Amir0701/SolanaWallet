@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.sol.feature.auth.impl.test.impl-mergeDebugScreenshotTestResources-44:/values-v30/values-v30.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\usmonov.a\\.gradle\\caches\\8.13\\transforms\\ef240009096da7862ecf5a9ac4302090\\transformed\\material3-release\\res\\values-v30\\values-v30.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "72",
+                        "endOffsets": "123"
+                    }
+                }
+            ]
+        }
+    ]
+}

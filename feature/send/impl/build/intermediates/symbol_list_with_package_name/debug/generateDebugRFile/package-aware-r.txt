@@ -1,0 +1,9 @@
+com.sol.feature.send.impl
+string send_amount_sol
+string send_back
+string send_confirm
+string send_error_bad_amount
+string send_error_failed
+string send_recipient
+string send_success
+string send_title

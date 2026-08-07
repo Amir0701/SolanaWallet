@@ -1,0 +1,1 @@
+-keep,allowobfuscation,allowshrinking class com.sol.feature.auth.impl.AuthViewModel

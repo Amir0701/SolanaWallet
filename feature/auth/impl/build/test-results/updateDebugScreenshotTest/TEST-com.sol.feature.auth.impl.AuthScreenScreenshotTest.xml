@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sol.feature.auth.impl.AuthScreenScreenshotTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-07-15T09:25:50.627Z" hostname="01-A-USMONOV" time="0.513">
+  <properties/>
+  <testcase name="AuthScreenScreenshotTest" classname="com.sol.feature.auth.impl.AuthScreenScreenshotTest" time="0.051"/>
+  <testcase name="AuthModalSheet" classname="com.sol.feature.auth.impl.AuthScreenScreenshotTest" time="0.007"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

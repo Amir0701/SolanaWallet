@@ -1,0 +1,10 @@
+<resources>
+    <string name="send_title">Отправка SOL</string>
+    <string name="send_recipient">Адрес получателя</string>
+    <string name="send_amount_sol">Сумма (SOL)</string>
+    <string name="send_confirm">Подтвердить отправку</string>
+    <string name="send_back">Назад</string>
+    <string name="send_error_bad_amount">Укажите корректную сумму в SOL.</string>
+    <string name="send_error_failed">Не удалось отправить транзакцию</string>
+    <string name="send_success">Транзакция отправлена</string>
+</resources>

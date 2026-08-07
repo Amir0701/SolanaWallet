@@ -1,0 +1,11 @@
+R_DEF: Internal format may change without notice
+local
+string auth_create_wallet
+string auth_error_invalid_mnemonic
+string auth_import_action
+string auth_import_hint
+string auth_mnemonic_body
+string auth_mnemonic_confirm
+string auth_mnemonic_title
+string auth_welcome_subtitle
+string auth_welcome_title

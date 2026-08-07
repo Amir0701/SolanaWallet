@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Solana кошелёк</string>
+    <string name="balance_label">Баланс</string>
+    <string name="refresh">Обновить</string>
+    <string name="send">Отправить</string>
+    <string name="receive">Получить</string>
+    <string name="your_address">Ваш адрес</string>
+    <string name="copy">Копировать</string>
+    <string name="copied">Скопировано</string>
+    <string name="network_devnet">Сеть: Devnet</string>
+    <string name="network_mainnet">Сеть: Mainnet</string>
+    <string name="delete_wallet">Удалить кошелёк с устройства</string>
+</resources>

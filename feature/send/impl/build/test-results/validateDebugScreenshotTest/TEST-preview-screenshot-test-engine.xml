@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuite name="Preview Screenshot Test Engine" tests="1" skipped="0" failures="0" errors="0" time="7.037" hostname="01-A-Usmonov" timestamp="2026-07-15T14:40:21">
+<properties>
+<property name="deviceId" value="Preview"/>
+<property name="deviceDisplayName" value="Preview"/>
+</properties>
+<testcase name="SendScreenPreviewTest" classname="com.sol.feature.send.impl.SendScreenScreenshotTest" time="0.105">
+<properties>
+<property name="PreviewScreenshot.diffPercent" value="0.0"/>
+<property name="PreviewScreenshot.previewName" value="SendScreenPreviewTest"/>
+<property name="PreviewScreenshot.methodName" value="SendScreenPreviewTest"/>
+<property name="PreviewScreenshot.refImagePath" value="feature\send\impl\src\screenshotTestDebug\reference\com\sol\feature\send\impl\SendScreenScreenshotTest\SendScreenPreviewTest_748aa731_0.png"/>
+<property name="PreviewScreenshot.newImagePath" value="feature\send\impl\build\outputs\screenshotTest-results\preview\debug\rendered\com\sol\feature\send\impl\SendScreenScreenshotTest\SendScreenPreviewTest_748aa731_0.png"/>
+</properties>
+
+<system-out><![CDATA[
+unique-id: [engine:preview-screenshot-test-engine]/[class:com.sol.feature.send.impl.SendScreenScreenshotTest]/[method:SendScreenPreviewTest]/[previewAnnotation:com.sol.feature.send.impl.SendScreenScreenshotTest.SendScreenPreviewTest_748aa731]/[previewId:com.sol.feature.send.impl.SendScreenScreenshotTest.SendScreenPreviewTest_748aa731_0]
+display-name: SendScreenPreviewTest
+]]></system-out>
+</testcase>
+<system-out><![CDATA[
+unique-id: [engine:preview-screenshot-test-engine]
+display-name: Preview Screenshot Test Engine
+]]></system-out>
+</testsuite>
