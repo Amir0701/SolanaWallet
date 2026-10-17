@@ -159,7 +159,12 @@ jobs:
           disable-animations: true
           script: |
             chmod +x gradlew
-            ./gradlew connectedDebugAndroidTest --stacktrace
+            ./gradlew \
+              :app:connectedDebugAndroidTest \
+              :feature:auth:impl:connectedDebugAndroidTest \
+              :feature:send:impl:connectedDebugAndroidTest \
+              :feature:receive:impl:connectedDebugAndroidTest \
+              --stacktrace
 
       - name: Upload UI test reports
         if: always()
