@@ -157,14 +157,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: |
-            chmod +x gradlew
-            ./gradlew \
-              :app:connectedDebugAndroidTest \
-              :feature:auth:impl:connectedDebugAndroidTest \
-              :feature:send:impl:connectedDebugAndroidTest \
-              :feature:receive:impl:connectedDebugAndroidTest \
-              --stacktrace
+          script: chmod +x gradlew && ./gradlew :app:connectedDebugAndroidTest :feature:auth:impl:connectedDebugAndroidTest :feature:send:impl:connectedDebugAndroidTest :feature:receive:impl:connectedDebugAndroidTest --stacktrace
 
       - name: Upload UI test reports
         if: always()
