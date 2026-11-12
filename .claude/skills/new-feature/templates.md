@@ -127,12 +127,17 @@ class SendViewModel @Inject constructor(
     private val _messages = Channel<SendMessage>(capacity = Channel.BUFFERED)
     val messages = _messages.receiveAsFlow()
 
-    fun onRecipientChange(value: String) = _state.update { it.copy(recipient = value) }
+    fun onRecipientChange(value: String) {
+        _state.update { it.copy(recipient = value) }
+    }
 
-    fun onAmountChange(value: String) = _state.update { it.copy(amountSol = value) }
+    fun onAmountChange(value: String) {
+        _state.update { it.copy(amountSol = value) }
+    }
 
     fun send() {
         val current = _state.value
+        // Флаг ставится до launch: повторное нажатие не должно отправить перевод второй раз
         if (current.isSending) return
         _state.update { it.copy(isSending = true) }
         viewModelScope.launch {
@@ -183,23 +188,23 @@ internal fun SendScreen(
     }
 
     SendScreenContent(
+        modifier = modifier,
         state = state,
+        onBack = onBack,
         onRecipientChange = viewModel::onRecipientChange,
         onAmountChange = viewModel::onAmountChange,
-        onSend = viewModel::send,
-        onBack = onBack,
-        modifier = modifier,
+        send = viewModel::send,
     )
 }
 
 @Composable
 fun SendScreenContent(
+    modifier: Modifier = Modifier,
     state: SendViewModel.UiState,
+    onBack: () -> Unit,
     onRecipientChange: (String) -> Unit,
     onAmountChange: (String) -> Unit,
-    onSend: () -> Unit,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier,
+    send: () -> Unit,
 ) {
     // OutlinedTextField(value = state.recipient, onValueChange = onRecipientChange, …)
 }
