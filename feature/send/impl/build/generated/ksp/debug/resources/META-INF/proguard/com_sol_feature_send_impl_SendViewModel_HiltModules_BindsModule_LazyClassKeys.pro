@@ -1,1 +1,0 @@
--keep,allowobfuscation,allowshrinking class com.sol.feature.send.impl.SendViewModel
