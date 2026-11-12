@@ -213,7 +213,7 @@ class SendScreenTest {
             .onNodeWithText(context.getString(R.string.send_amount_sol))
             .performTextInput("2.5")
 
-        verify { viewModel.onRecipientChange(any()) }
-        verify { viewModel.onAmountChange(any()) }
+        verify { viewModel.onRecipientChange("RecipientAddress123") }
+        verify { viewModel.onAmountChange("2.5") }
     }
 }

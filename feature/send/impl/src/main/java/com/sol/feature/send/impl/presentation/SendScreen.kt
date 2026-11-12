@@ -51,8 +51,8 @@ internal fun SendScreen(
         modifier = modifier,
         state = state,
         onBack = onBack,
-        onRecipientChange = { viewModel.onRecipientChange(state.recipient) },
-        onAmountChange = { viewModel.onAmountChange(state.amountSol) },
+        onRecipientChange = viewModel::onRecipientChange,
+        onAmountChange = viewModel::onAmountChange,
         send = viewModel::send
     )
 }
@@ -62,8 +62,8 @@ fun SendScreenContent(
     modifier: Modifier = Modifier,
     state: SendViewModel.UiState,
     onBack: () -> Unit,
-    onRecipientChange: () -> Unit,
-    onAmountChange: () -> Unit,
+    onRecipientChange: (String) -> Unit,
+    onAmountChange: (String) -> Unit,
     send: () -> Unit,
 ) {
     Column(
@@ -73,7 +73,7 @@ fun SendScreenContent(
         Text(stringResource(R.string.send_title), style = MaterialTheme.typography.titleLarge)
         OutlinedTextField(
             value = state.recipient,
-            onValueChange = {onRecipientChange()},
+            onValueChange = onRecipientChange,
             modifier = Modifier.fillMaxWidth(),
             label = { Text(stringResource(R.string.send_recipient)) },
             singleLine = false,
@@ -81,7 +81,7 @@ fun SendScreenContent(
         )
         OutlinedTextField(
             value = state.amountSol,
-            onValueChange = { onAmountChange() },
+            onValueChange = onAmountChange,
             modifier = Modifier.fillMaxWidth(),
             label = { Text(stringResource(R.string.send_amount_sol)) },
             singleLine = true,
