@@ -49,8 +49,10 @@ class SendViewModel @Inject constructor(
 
     fun send() {
         val current = _state.value
+        // Флаг ставится до launch: повторное нажатие не должно отправить перевод второй раз
+        if (current.isSending) return
+        _state.update { it.copy(isSending = true) }
         viewModelScope.launch {
-            _state.update { it.copy(isSending = true) }
             when (val result = sendSol(current.recipient, current.amountSol)) {
                 is SendSolResult.Success -> {
                     _state.update { UiState(lastSignature = result.signature) }

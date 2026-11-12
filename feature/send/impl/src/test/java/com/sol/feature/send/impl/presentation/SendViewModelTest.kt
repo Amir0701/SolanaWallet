@@ -7,10 +7,12 @@ import com.sol.feature.send.impl.domain.usecase.SendSolUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -43,6 +45,22 @@ class SendViewModelTest {
         viewModel.send()
 
         coVerify(exactly = 1) { sendSol("  recipient  ", " 1.5 ") }
+    }
+
+    @Test
+    fun `second send while sending does not call use case again`() = runTest {
+        val pending = CompletableDeferred<SendSolResult>()
+        coEvery { sendSol(any(), any()) } coAnswers { pending.await() }
+        viewModel.onRecipientChange("recipient")
+        viewModel.onAmountChange("1")
+
+        viewModel.send()
+        assertTrue(viewModel.state.value.isSending)
+        viewModel.send()
+
+        coVerify(exactly = 1) { sendSol(any(), any()) }
+        pending.complete(SendSolResult.Success("sig"))
+        assertFalse(viewModel.state.value.isSending)
     }
 
     @Test
