@@ -4,6 +4,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.sol.feature.send.api.SendFeature
+import com.sol.feature.send.impl.presentation.SendScreen
 
 fun NavGraphBuilder.sendScreen(
     onBack: () -> Unit,

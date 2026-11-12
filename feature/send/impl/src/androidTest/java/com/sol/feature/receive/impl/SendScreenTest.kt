@@ -7,9 +7,9 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.sol.feature.send.impl.R
-import com.sol.feature.send.impl.SendMessage
-import com.sol.feature.send.impl.SendScreen
-import com.sol.feature.send.impl.SendViewModel
+import com.sol.feature.send.impl.presentation.SendMessage
+import com.sol.feature.send.impl.presentation.SendScreen
+import com.sol.feature.send.impl.presentation.SendViewModel
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

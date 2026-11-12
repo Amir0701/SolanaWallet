@@ -1,4 +1,4 @@
-package com.sol.feature.send.impl
+package com.sol.feature.send.impl.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.sol.feature.send.impl.R
 
 @Composable
 internal fun SendScreen(

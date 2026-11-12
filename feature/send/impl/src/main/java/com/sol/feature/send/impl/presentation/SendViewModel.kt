@@ -1,11 +1,10 @@
-package com.sol.feature.send.impl
+package com.sol.feature.send.impl.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sol.core.wallet.SolFormatting
-import com.sol.core.wallet.WalletSessionManager
+import com.sol.feature.send.impl.domain.model.SendSolResult
+import com.sol.feature.send.impl.domain.usecase.SendSolUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +23,7 @@ sealed interface SendMessage {
 
 @HiltViewModel
 class SendViewModel @Inject constructor(
-    private val sessionManager: WalletSessionManager,
+    private val sendSol: SendSolUseCase,
 ) : ViewModel() {
 
     data class UiState(
@@ -49,32 +48,22 @@ class SendViewModel @Inject constructor(
     }
 
     fun send() {
-        val recipient = _state.value.recipient.trim()
-        val amountSol = _state.value.amountSol.trim()
-        viewModelScope.launch(Dispatchers.IO) {
-            val lamports = runCatching { SolFormatting.parseSolToLamports(amountSol) }.getOrNull()
-            if (lamports == null || lamports <= 0L) {
-                _messages.trySend(SendMessage.BadAmount)
-                return@launch
-            }
+        val current = _state.value
+        viewModelScope.launch {
             _state.update { it.copy(isSending = true) }
-            val result = sessionManager.transfer(recipient, lamports)
-            if (result.isSuccess) {
-                _state.update {
-                    it.copy(
-                        isSending = false,
-                        lastSignature = result.getOrNull(),
-                        recipient = "",
-                        amountSol = "",
-                    )
+            when (val result = sendSol(current.recipient, current.amountSol)) {
+                is SendSolResult.Success -> {
+                    _state.update { UiState(lastSignature = result.signature) }
+                    _messages.trySend(SendMessage.Success)
                 }
-                _messages.trySend(SendMessage.Success)
-            } else {
-                _state.update { it.copy(isSending = false) }
-                val text = result.exceptionOrNull()?.message
-                _messages.trySend(
-                    if (text.isNullOrBlank()) SendMessage.Failed else SendMessage.Plain(text),
-                )
+                SendSolResult.InvalidAmount -> {
+                    _state.update { it.copy(isSending = false) }
+                    _messages.trySend(SendMessage.BadAmount)
+                }
+                is SendSolResult.Failed -> {
+                    _state.update { it.copy(isSending = false) }
+                    _messages.trySend(result.reason?.let(SendMessage::Plain) ?: SendMessage.Failed)
+                }
             }
         }
     }
