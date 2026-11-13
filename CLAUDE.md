@@ -56,7 +56,7 @@ Android-кошелёк для одного Solana-аккаунта: создан
 1. `:app:assembleDebug` проходит, unit-тесты затронутых модулей зелёные. После правки `:core:*` — ещё и тесты зависимых модулей.
 2. Менялся UI — `validateDebugScreenshotTest` затронутых модулей. Есть эмулятор — их `connectedDebugAndroidTest`.
 3. Менялся код фичи на слоях — проверки из «Как проверяется» в `docs/architecture.md` дают пустой вывод.
-4. Закоммить в отдельную ветку от `master` (в сам `master` — никогда), запушь и создай PR в `master` через `gh pr create`. Если PR для ветки уже открыт — только запушь. В коммит не попадают `.idea/`, `local.properties` и изменения, не относящиеся к задаче.
+4. Закоммить в отдельную ветку от `master` (в сам `master` — никогда), запушь и создай PR в `master` через `gh pr create`. Если PR для ветки уже открыт — `git fetch && git merge origin/master` (без rebase и force push). Конфликт в `:core:*` или в логике перевода не разрешай сам — опиши его и спроси. В коммит не попадают `.idea/`, `local.properties` и изменения, не относящиеся к задаче.
 5. Дождись CI в фоне. Одного `gh pr checks --watch` мало: он выходит, когда закончился Build, а остальные job стартуют после него. Повторяй, пока есть pending (код выхода 8):
    ```bash
    while gh pr checks <номер> --watch --interval 30 >/dev/null 2>&1; gh pr checks <номер> >/dev/null 2>&1; [ $? -eq 8 ]; do sleep 30; done; gh pr checks <номер>
