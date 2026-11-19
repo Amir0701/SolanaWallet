@@ -16,7 +16,7 @@ presentation ──→ domain ←── data ──→ WalletSessionManager (:co
 |---|---|---|---|---|
 | domain | `<impl>.domain` | модели, интерфейсы репозиториев, use case | Kotlin stdlib, `java.math`, `kotlinx.coroutines` (кроме `Dispatchers`), `javax.inject`, `com.sol.core.wallet.SolFormatting` | `android.*`, `androidx.*`, `dagger.hilt.*`, остальное из `com.sol.core.wallet`, `data`, `presentation` |
 | data | `<impl>.data` | реализации репозиториев | `domain`, `WalletSessionManager` и типы `:core:wallet`, `kotlinx.coroutines` | `presentation` |
-| presentation | `<impl>.presentation` | ViewModel, экран, сообщения | `domain` (use case и модели), Compose, Lifecycle, Hilt | `data`, `WalletSessionManager`, интерфейсы репозиториев, `Dispatchers` |
+| presentation | `<impl>.presentation` | ViewModel, экран, состояние, интенты, сообщения | `domain` (use case и модели), Compose, Lifecycle, Hilt | `data`, `WalletSessionManager`, интерфейсы репозиториев, `Dispatchers` |
 | di | `<impl>.di` | Hilt-модуль с `@Binds` | `domain`, `data` | `presentation` |
 
 `<impl>` — `com.sol.feature.<name>.impl`.
@@ -34,7 +34,8 @@ feature/<name>/impl/src/
 │   ├── data/<X>RepositoryImpl.kt
 │   ├── di/<Name>Module.kt
 │   └── presentation/
-│       ├── <Name>ViewModel.kt          UiState внутри, sealed-сообщения рядом
+│       ├── <Name>MVIComponent.kt       <Name>ScreenUiState, <Name>Intent, <Name>Message
+│       ├── <Name>ViewModel.kt          state, messages, onIntent()
 │       └── <Name>Screen.kt             <Name>Screen (internal) + <Name>ScreenContent
 ├── main/res/values/strings.xml
 ├── test/java/com/sol/feature/<name>/impl/
@@ -71,12 +72,14 @@ feature/<name>/impl/src/
 ## presentation
 
 - ViewModel зависит только от use case. Она не импортирует `data`, `WalletSessionManager`, репозитории и `Dispatchers`: use case и репозитории уже main-safe.
-- `UiState` — `data class` внутри ViewModel, наружу `StateFlow`. Одноразовые события — `Channel` + `receiveAsFlow()`, тип событий — sealed interface в том же файле.
-- ViewModel переводит `<Action>Result` в `UiState` и события. Текст для пользователя берётся из `strings.xml` в Composable, а не во ViewModel.
+- Состояние, действия и события экрана лежат в `<Name>MVIComponent.kt`: `data class <Name>ScreenUiState`, `sealed class <Name>Intent` и `sealed interface <Name>Message`.
+- Состояние наружу — `StateFlow<<Name>ScreenUiState>`. Одноразовые события — `Channel<<Name>Message>` + `receiveAsFlow()`.
+- Действия пользователя ViewModel принимает одним методом `onIntent(intent: <Name>Intent)` с исчерпывающим `when`. Остальные её методы — `private`. Навигация — не интент: она уходит колбэком.
+- ViewModel переводит `<Action>Result` в `<Name>ScreenUiState` и события. Текст для пользователя берётся из `strings.xml` в Composable, а не во ViewModel.
 - `<Name>Screen` — `internal`, берёт ViewModel через `hiltViewModel()`, собирает состояние через `collectAsStateWithLifecycle()` и передаёт его в `<Name>ScreenContent`.
-- `<Name>ScreenContent` не хранит состояние: получает `UiState` и лямбды. Лямбды передают новое значение: `onAmountChange: (String) -> Unit`, а не `() -> Unit`.
+- `<Name>ScreenContent` не хранит состояние: получает `<Name>ScreenUiState`, `onIntent: (<Name>Intent) -> Unit` и колбэки навигации. Новое значение едет в интенте: `onIntent(<Name>Intent.ChangeAmount(it))`.
 - Экран не знает о `NavController`. Навигация и сообщения уходят колбэками (`onBack`, `onShowMessage`), их подключает `WalletNavHost`.
-- Видимость как сейчас: `<Name>Screen` — `internal`, `<Name>ScreenContent` и ViewModel с `UiState` — public, потому что их видят скриншот-тесты. Use case и доменные модели тогда тоже public: public-конструктор ViewModel не может принимать internal-тип. `:app` импортирует из `impl` только `<name>Screen()`.
+- Видимость как сейчас: `<Name>Screen` — `internal`, `<Name>ScreenContent`, ViewModel и типы из `<Name>MVIComponent.kt` — public, потому что их видят скриншот-тесты. Use case и доменные модели тогда тоже public: public-конструктор ViewModel не может принимать internal-тип. `:app` импортирует из `impl` только `<name>Screen()`.
 
 ## di
 
@@ -103,8 +106,8 @@ Use case и реализации репозиториев создаются ч�
 |---|---|---|---|
 | domain | каждую ветку `<Action>Result`, правила валидации | MockK интерфейса репозитория, `coEvery` / `coVerify` | `runTest`, без `MainDispatcherRule` |
 | data | перевод типов сессии в доменные, вызов нужного метода сессии | `mockk<WalletSessionManager>()` | `runTest`, без реального RPC |
-| presentation | `UiState` и события для каждого исхода use case | MockK use case | `MainDispatcherRule`, Turbine |
-| UI | `<Name>ScreenContent` | фейковый `UiState` и фейковый адрес, как в существующих скриншот-тестах | скриншот-тест и Compose-тест в `androidTest` |
+| presentation | `<Name>ScreenUiState` и события для каждого исхода use case, действия через `onIntent` | MockK use case | `MainDispatcherRule`, Turbine |
+| UI | `<Name>ScreenContent` | фейковый `<Name>ScreenUiState` и фейковый адрес, как в существующих скриншот-тестах | скриншот-тест и Compose-тест в `androidTest` |
 
 Правила валидации проверяются в тестах use case, а не ViewModel.
 
