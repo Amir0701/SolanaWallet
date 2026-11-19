@@ -29,7 +29,7 @@ description: Создаёт новую фичу SolanaCryproWallet — моду�
 3. `domain/usecase`: use case с бизнес-правилами.
 4. `data`: `<X>RepositoryImpl` поверх `WalletSessionManager`, переключение потока.
 5. `di/<Name>Module.kt`: `@Binds` для каждого репозитория.
-6. `presentation`: ViewModel и `<Name>Screen.kt` с `<Name>Screen` и `<Name>ScreenContent`.
+6. `presentation`: `<Name>MVIComponent.kt` с `<Name>ScreenUiState`, `<Name>Intent` и `<Name>Message`, ViewModel с `onIntent(<Name>Intent)` и `<Name>Screen.kt` с `<Name>Screen` и `<Name>ScreenContent`.
 7. `<Name>NavGraph.kt` в корневом пакете: `NavGraphBuilder.<name>Screen(...)`.
 8. `res/values/strings.xml`: строки на русском с префиксом `<name>_`.
 9. `WalletNavHost`: вызов `<name>Screen(...)` и переход на экран. Если переход — кнопка на home, её строка идёт в `app/src/main/res/values/strings.xml`.

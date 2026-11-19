@@ -7,8 +7,10 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.sol.feature.send.impl.R
+import com.sol.feature.send.impl.presentation.SendIntent
 import com.sol.feature.send.impl.presentation.SendMessage
 import com.sol.feature.send.impl.presentation.SendScreen
+import com.sol.feature.send.impl.presentation.SendScreenUiState
 import com.sol.feature.send.impl.presentation.SendViewModel
 import io.mockk.every
 import io.mockk.mockk
@@ -25,7 +27,7 @@ class SendScreenTest {
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     private val viewModel: SendViewModel = mockk<SendViewModel>(relaxed = true).apply {
-        every { state } returns MutableStateFlow(SendViewModel.UiState())
+        every { state } returns MutableStateFlow(SendScreenUiState())
     }
 
     @Test
@@ -155,7 +157,7 @@ class SendScreenTest {
     fun checkSendingStateHidesConfirmButton() {
         val context = composeTestRule.activity
         val sendingViewModel = mockk<SendViewModel>(relaxed = true).apply {
-            every { state } returns MutableStateFlow(SendViewModel.UiState(isSending = true))
+            every { state } returns MutableStateFlow(SendScreenUiState(isSending = true))
             every { messages } returns flowOf()
         }
 
@@ -176,7 +178,7 @@ class SendScreenTest {
     fun checkLastSignatureIsDisplayed() {
         val signature = "5xSignature11111111111111111111111111111111"
         val signatureViewModel = mockk<SendViewModel>(relaxed = true).apply {
-            every { state } returns MutableStateFlow(SendViewModel.UiState(lastSignature = signature))
+            every { state } returns MutableStateFlow(SendScreenUiState(lastSignature = signature))
             every { messages } returns flowOf()
         }
 
@@ -213,7 +215,7 @@ class SendScreenTest {
             .onNodeWithText(context.getString(R.string.send_amount_sol))
             .performTextInput("2.5")
 
-        verify { viewModel.onRecipientChange("RecipientAddress123") }
-        verify { viewModel.onAmountChange("2.5") }
+        verify { viewModel.onIntent(SendIntent.ChangeRecipient("RecipientAddress123")) }
+        verify { viewModel.onIntent(SendIntent.ChangeAmount("2.5")) }
     }
 }

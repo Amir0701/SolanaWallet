@@ -21,15 +21,15 @@ description: Переводит существующую фичу SolanaCryproWa
 
 1. Создай `domain`, `data`, `di` по шаблонам.
 2. Перенеси бизнес-правила из ViewModel в use case: разбор суммы, проверку пустых значений, разбор слов мнемоники. Переключение потока (`Dispatchers.IO` / `Default`) перенеси из ViewModel в репозиторий.
-3. ViewModel и экран перенеси в пакет `presentation`. ViewModel теперь получает use case вместо `WalletSessionManager`. Публичный API `UiState` и сообщений не меняй без необходимости.
+3. ViewModel и экран перенеси в пакет `presentation`. ViewModel теперь получает use case вместо `WalletSessionManager`. Состояние, действия и сообщения вынеси в `<Name>MVIComponent.kt` (`<Name>ScreenUiState`, `<Name>Intent`, `<Name>Message`), методы ViewModel для действий замени на `onIntent`. Поля состояния и виды сообщений не меняй.
 4. `<Name>NavGraph.kt` оставь в корневом пакете `impl`, чтобы импорты в `WalletNavHost` не менялись.
 
 ## 3. Тесты
 
 - Сценарии валидации и разбора переезжают в тесты use case. Сценарии состояния и событий остаются в тесте ViewModel, с моками use case вместо `WalletSessionManager`.
 - Тест ViewModel перенеси в `test/.../impl/presentation/`. `MainDispatcherRule` оставь в корневом тестовом пакете и импортируй.
-- Скриншот-тест оставь с тем же именем класса и в том же пакете: путь к эталону зависит от них. Обнови только импорт `<Name>ScreenContent`.
-- В `androidTest` обнови только импорты.
+- Скриншот-тест оставь с тем же именем класса и в том же пакете: путь к эталону зависит от них. Обнови только импорты и параметры вызова `<Name>ScreenContent`.
+- В `androidTest` обнови только импорты, тип состояния и вызовы ViewModel под `onIntent`.
 - В ответе дай таблицу «старый тест → новый тест». Ни один сценарий не пропадает молча.
 
 ## 4. Проверка

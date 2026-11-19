@@ -14,40 +14,26 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed interface SendMessage {
-    data object Success : SendMessage
-    data object BadAmount : SendMessage
-    data object Failed : SendMessage
-    data class Plain(val text: String) : SendMessage
-}
-
 @HiltViewModel
 class SendViewModel @Inject constructor(
     private val sendSol: SendSolUseCase,
 ) : ViewModel() {
 
-    data class UiState(
-        val recipient: String = "",
-        val amountSol: String = "",
-        val isSending: Boolean = false,
-        val lastSignature: String? = null,
-    )
-
-    private val _state = MutableStateFlow(UiState())
-    val state: StateFlow<UiState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(SendScreenUiState())
+    val state: StateFlow<SendScreenUiState> = _state.asStateFlow()
 
     private val _messages = Channel<SendMessage>(capacity = Channel.BUFFERED)
     val messages = _messages.receiveAsFlow()
 
-    fun onRecipientChange(value: String) {
-        _state.update { it.copy(recipient = value) }
+    fun onIntent(intent: SendIntent) {
+        when (intent) {
+            is SendIntent.ChangeRecipient -> _state.update { it.copy(recipient = intent.value) }
+            is SendIntent.ChangeAmount -> _state.update { it.copy(amountSol = intent.value) }
+            SendIntent.Send -> send()
+        }
     }
 
-    fun onAmountChange(value: String) {
-        _state.update { it.copy(amountSol = value) }
-    }
-
-    fun send() {
+    private fun send() {
         val current = _state.value
         // Флаг ставится до launch: повторное нажатие не должно отправить перевод второй раз
         if (current.isSending) return
@@ -55,7 +41,7 @@ class SendViewModel @Inject constructor(
         viewModelScope.launch {
             when (val result = sendSol(current.recipient, current.amountSol)) {
                 is SendSolResult.Success -> {
-                    _state.update { UiState(lastSignature = result.signature) }
+                    _state.update { SendScreenUiState(lastSignature = result.signature) }
                     _messages.trySend(SendMessage.Success)
                 }
                 SendSolResult.InvalidAmount -> {

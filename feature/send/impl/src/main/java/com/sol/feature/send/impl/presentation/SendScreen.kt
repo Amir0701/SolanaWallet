@@ -51,20 +51,16 @@ internal fun SendScreen(
         modifier = modifier,
         state = state,
         onBack = onBack,
-        onRecipientChange = viewModel::onRecipientChange,
-        onAmountChange = viewModel::onAmountChange,
-        send = viewModel::send
+        onIntent = viewModel::onIntent,
     )
 }
 
 @Composable
 fun SendScreenContent(
     modifier: Modifier = Modifier,
-    state: SendViewModel.UiState,
+    state: SendScreenUiState,
     onBack: () -> Unit,
-    onRecipientChange: (String) -> Unit,
-    onAmountChange: (String) -> Unit,
-    send: () -> Unit,
+    onIntent: (SendIntent) -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -73,7 +69,7 @@ fun SendScreenContent(
         Text(stringResource(R.string.send_title), style = MaterialTheme.typography.titleLarge)
         OutlinedTextField(
             value = state.recipient,
-            onValueChange = onRecipientChange,
+            onValueChange = { onIntent(SendIntent.ChangeRecipient(it)) },
             modifier = Modifier.fillMaxWidth(),
             label = { Text(stringResource(R.string.send_recipient)) },
             singleLine = false,
@@ -81,7 +77,7 @@ fun SendScreenContent(
         )
         OutlinedTextField(
             value = state.amountSol,
-            onValueChange = onAmountChange,
+            onValueChange = { onIntent(SendIntent.ChangeAmount(it)) },
             modifier = Modifier.fillMaxWidth(),
             label = { Text(stringResource(R.string.send_amount_sol)) },
             singleLine = true,
@@ -97,7 +93,7 @@ fun SendScreenContent(
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(onClick = onBack) { Text(stringResource(R.string.send_back)) }
             Button(
-                onClick = { send() },
+                onClick = { onIntent(SendIntent.Send) },
                 enabled = !state.isSending,
             ) {
                 if (state.isSending) {

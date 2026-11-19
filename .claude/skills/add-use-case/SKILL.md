@@ -26,8 +26,8 @@ description: Добавляет новую операцию в существу�
 3. `domain/usecase`: `<Verb><Noun>UseCase`, бизнес-правила здесь.
 4. `data`: реализация метода, `withContext(Dispatchers.IO)` для RPC или `Dispatchers.Default` для мнемоники.
 5. `di`: `@Binds`, только если появился новый интерфейс.
-6. `presentation`: use case в конструктор ViewModel, поля в `UiState`, новые события в sealed-тип сообщений, обработка каждого исхода.
-7. `<Name>ScreenContent`: новые параметры и лямбды с значением. `<Name>Screen` передаёт их из ViewModel.
+6. `presentation`: use case в конструктор ViewModel. В `<Name>MVIComponent.kt` — поля в `<Name>ScreenUiState`, новое действие подклассом `<Name>Intent`, новые события в `<Name>Message`. Во ViewModel — ветка в `onIntent` и обработка каждого исхода.
+7. `<Name>ScreenContent`: выводит новые поля состояния, действие отправляет через `onIntent(<Name>Intent.…)`. Отдельных лямбд под действия не добавляй.
 8. `strings.xml` фичи: новые строки на русском.
 
 ## 3. Тесты

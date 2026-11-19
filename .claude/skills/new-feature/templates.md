@@ -97,10 +97,25 @@ abstract class SendModule {
 }
 ```
 
-## presentation/SendViewModel.kt
+## presentation/SendMVIComponent.kt
+
+Состояние экрана, действия пользователя и одноразовые события — в одном файле.
 
 ```kotlin
 package com.sol.feature.send.impl.presentation
+
+data class SendScreenUiState(
+    val recipient: String = "",
+    val amountSol: String = "",
+    val isSending: Boolean = false,
+    val lastSignature: String? = null,
+)
+
+sealed class SendIntent {
+    data class ChangeRecipient(val value: String) : SendIntent()
+    data class ChangeAmount(val value: String) : SendIntent()
+    data object Send : SendIntent()
+}
 
 sealed interface SendMessage {
     data object Success : SendMessage
@@ -108,34 +123,35 @@ sealed interface SendMessage {
     data object Failed : SendMessage
     data class Plain(val text: String) : SendMessage
 }
+```
+
+Навигация («Назад») — не интент: она уходит колбэком `onBack`, его подключает `WalletNavHost`.
+
+## presentation/SendViewModel.kt
+
+```kotlin
+package com.sol.feature.send.impl.presentation
 
 @HiltViewModel
 class SendViewModel @Inject constructor(
     private val sendSol: SendSolUseCase,
 ) : ViewModel() {
 
-    data class UiState(
-        val recipient: String = "",
-        val amountSol: String = "",
-        val isSending: Boolean = false,
-        val lastSignature: String? = null,
-    )
-
-    private val _state = MutableStateFlow(UiState())
-    val state: StateFlow<UiState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(SendScreenUiState())
+    val state: StateFlow<SendScreenUiState> = _state.asStateFlow()
 
     private val _messages = Channel<SendMessage>(capacity = Channel.BUFFERED)
     val messages = _messages.receiveAsFlow()
 
-    fun onRecipientChange(value: String) {
-        _state.update { it.copy(recipient = value) }
+    fun onIntent(intent: SendIntent) {
+        when (intent) {
+            is SendIntent.ChangeRecipient -> _state.update { it.copy(recipient = intent.value) }
+            is SendIntent.ChangeAmount -> _state.update { it.copy(amountSol = intent.value) }
+            SendIntent.Send -> send()
+        }
     }
 
-    fun onAmountChange(value: String) {
-        _state.update { it.copy(amountSol = value) }
-    }
-
-    fun send() {
+    private fun send() {
         val current = _state.value
         // Флаг ставится до launch: повторное нажатие не должно отправить перевод второй раз
         if (current.isSending) return
@@ -143,7 +159,7 @@ class SendViewModel @Inject constructor(
         viewModelScope.launch {
             when (val result = sendSol(current.recipient, current.amountSol)) {
                 is SendSolResult.Success -> {
-                    _state.update { UiState(lastSignature = result.signature) }
+                    _state.update { SendScreenUiState(lastSignature = result.signature) }
                     _messages.trySend(SendMessage.Success)
                 }
                 SendSolResult.InvalidAmount -> {
@@ -191,22 +207,19 @@ internal fun SendScreen(
         modifier = modifier,
         state = state,
         onBack = onBack,
-        onRecipientChange = viewModel::onRecipientChange,
-        onAmountChange = viewModel::onAmountChange,
-        send = viewModel::send,
+        onIntent = viewModel::onIntent,
     )
 }
 
 @Composable
 fun SendScreenContent(
     modifier: Modifier = Modifier,
-    state: SendViewModel.UiState,
+    state: SendScreenUiState,
     onBack: () -> Unit,
-    onRecipientChange: (String) -> Unit,
-    onAmountChange: (String) -> Unit,
-    send: () -> Unit,
+    onIntent: (SendIntent) -> Unit,
 ) {
-    // OutlinedTextField(value = state.recipient, onValueChange = onRecipientChange, …)
+    // OutlinedTextField(value = state.recipient, onValueChange = { onIntent(SendIntent.ChangeRecipient(it)) }, …)
+    // Button(onClick = { onIntent(SendIntent.Send) }, enabled = !state.isSending) { … }
 }
 ```
 
@@ -288,14 +301,14 @@ class SendViewModelTest {
     @Test
     fun `success emits Success and resets the form`() = runTest {
         coEvery { sendSol("recipient", "1") } returns SendSolResult.Success("sig")
-        viewModel.onRecipientChange("recipient")
-        viewModel.onAmountChange("1")
+        viewModel.onIntent(SendIntent.ChangeRecipient("recipient"))
+        viewModel.onIntent(SendIntent.ChangeAmount("1"))
 
         viewModel.messages.test {
-            viewModel.send()
+            viewModel.onIntent(SendIntent.Send)
             assertEquals(SendMessage.Success, awaitItem())
         }
-        assertEquals(SendViewModel.UiState(lastSignature = "sig"), viewModel.state.value)
+        assertEquals(SendScreenUiState(lastSignature = "sig"), viewModel.state.value)
     }
 }
 ```

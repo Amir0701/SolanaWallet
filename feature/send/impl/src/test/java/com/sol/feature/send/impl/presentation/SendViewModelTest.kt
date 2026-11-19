@@ -26,23 +26,23 @@ class SendViewModelTest {
 
     @Test
     fun `onRecipientChange updates state`() {
-        viewModel.onRecipientChange("recipient-address")
+        viewModel.onIntent(SendIntent.ChangeRecipient("recipient-address"))
         assertEquals("recipient-address", viewModel.state.value.recipient)
     }
 
     @Test
     fun `onAmountChange updates state`() {
-        viewModel.onAmountChange("1.5")
+        viewModel.onIntent(SendIntent.ChangeAmount("1.5"))
         assertEquals("1.5", viewModel.state.value.amountSol)
     }
 
     @Test
     fun `send passes form values to use case`() = runTest {
         coEvery { sendSol(any(), any()) } returns SendSolResult.Success("sig")
-        viewModel.onRecipientChange("  recipient  ")
-        viewModel.onAmountChange(" 1.5 ")
+        viewModel.onIntent(SendIntent.ChangeRecipient("  recipient  "))
+        viewModel.onIntent(SendIntent.ChangeAmount(" 1.5 "))
 
-        viewModel.send()
+        viewModel.onIntent(SendIntent.Send)
 
         coVerify(exactly = 1) { sendSol("  recipient  ", " 1.5 ") }
     }
@@ -51,12 +51,12 @@ class SendViewModelTest {
     fun `second send while sending does not call use case again`() = runTest {
         val pending = CompletableDeferred<SendSolResult>()
         coEvery { sendSol(any(), any()) } coAnswers { pending.await() }
-        viewModel.onRecipientChange("recipient")
-        viewModel.onAmountChange("1")
+        viewModel.onIntent(SendIntent.ChangeRecipient("recipient"))
+        viewModel.onIntent(SendIntent.ChangeAmount("1"))
 
-        viewModel.send()
+        viewModel.onIntent(SendIntent.Send)
         assertTrue(viewModel.state.value.isSending)
-        viewModel.send()
+        viewModel.onIntent(SendIntent.Send)
 
         coVerify(exactly = 1) { sendSol(any(), any()) }
         pending.complete(SendSolResult.Success("sig"))
@@ -66,11 +66,11 @@ class SendViewModelTest {
     @Test
     fun `InvalidAmount emits BadAmount and keeps the form`() = runTest {
         coEvery { sendSol(any(), any()) } returns SendSolResult.InvalidAmount
-        viewModel.onRecipientChange("recipient")
-        viewModel.onAmountChange("abc")
+        viewModel.onIntent(SendIntent.ChangeRecipient("recipient"))
+        viewModel.onIntent(SendIntent.ChangeAmount("abc"))
 
         viewModel.messages.test {
-            viewModel.send()
+            viewModel.onIntent(SendIntent.Send)
             assertEquals(SendMessage.BadAmount, awaitItem())
         }
         val state = viewModel.state.value
@@ -82,24 +82,24 @@ class SendViewModelTest {
     @Test
     fun `Success emits Success and resets the form`() = runTest {
         coEvery { sendSol("recipient", "1.5") } returns SendSolResult.Success("sig123")
-        viewModel.onRecipientChange("recipient")
-        viewModel.onAmountChange("1.5")
+        viewModel.onIntent(SendIntent.ChangeRecipient("recipient"))
+        viewModel.onIntent(SendIntent.ChangeAmount("1.5"))
 
         viewModel.messages.test {
-            viewModel.send()
+            viewModel.onIntent(SendIntent.Send)
             assertEquals(SendMessage.Success, awaitItem())
         }
-        assertEquals(SendViewModel.UiState(lastSignature = "sig123"), viewModel.state.value)
+        assertEquals(SendScreenUiState(lastSignature = "sig123"), viewModel.state.value)
     }
 
     @Test
     fun `Failed with reason emits Plain`() = runTest {
         coEvery { sendSol(any(), any()) } returns SendSolResult.Failed("insufficient funds")
-        viewModel.onRecipientChange("recipient")
-        viewModel.onAmountChange("1")
+        viewModel.onIntent(SendIntent.ChangeRecipient("recipient"))
+        viewModel.onIntent(SendIntent.ChangeAmount("1"))
 
         viewModel.messages.test {
-            viewModel.send()
+            viewModel.onIntent(SendIntent.Send)
             assertEquals(SendMessage.Plain("insufficient funds"), awaitItem())
         }
         assertFalse(viewModel.state.value.isSending)
@@ -109,11 +109,11 @@ class SendViewModelTest {
     @Test
     fun `Failed without reason emits Failed`() = runTest {
         coEvery { sendSol(any(), any()) } returns SendSolResult.Failed(null)
-        viewModel.onRecipientChange("recipient")
-        viewModel.onAmountChange("1")
+        viewModel.onIntent(SendIntent.ChangeRecipient("recipient"))
+        viewModel.onIntent(SendIntent.ChangeAmount("1"))
 
         viewModel.messages.test {
-            viewModel.send()
+            viewModel.onIntent(SendIntent.Send)
             assertEquals(SendMessage.Failed, awaitItem())
         }
         assertFalse(viewModel.state.value.isSending)
